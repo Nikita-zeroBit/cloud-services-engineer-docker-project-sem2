@@ -6,7 +6,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: backend
-    image: ${DOCKER_USERNAME}/docker-project-backend:latest
+    image: ${DOCKER_USER}/docker-project-backend:latest
     ports:
       - "8081:8081"
     restart: unless-stopped
@@ -31,7 +31,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend
-    image: ${DOCKER_USERNAME}/docker-project-frontend:latest
+    image: ${DOCKER_USER}/docker-project-frontend:latest
     ports:
       - "80:80"
     restart: unless-stopped
