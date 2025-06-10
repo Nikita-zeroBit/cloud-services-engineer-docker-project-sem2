@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    image: ${DOCKER_USERNAME}/docker-project-backend:latest
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=info
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    read_only: true
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    image: ${DOCKER_USERNAME}/docker-project-frontend:latest
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 128M
+    read_only: true
+    volumes:
+      - nginx-cache:/var/cache/nginx:rw
+      - nginx-pid:/var/run:rw
+
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  nginx-cache:
+  nginx-pid:
