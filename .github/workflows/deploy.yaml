@@ -6,6 +6,62 @@ on:
       - main
 
 jobs:
+  build_scan_backend:
+    name: Сборка и сканирование бэкенда
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v3
+
+      - name: Установка Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Сборка образа бэкенда
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend/
+          push: false
+          load: true
+          tags: docker-project-backend:latest
+
+      - name: Запуск Trivy для бэкенда
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'docker-project-backend:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+  build_scan_frontend:
+    name: Сборка и сканирование фронтенда
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v3
+
+      - name: Установка Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Сборка образа фронтенда
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend/
+          push: false
+          load: true
+          tags: docker-project-frontend:latest
+
+      - name: Запуск Trivy для фронтенда
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'docker-project-frontend:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
   build_and_push_to_docker_hub:
       name: Push Docker image to DockerHub
       runs-on: ubuntu-latest
