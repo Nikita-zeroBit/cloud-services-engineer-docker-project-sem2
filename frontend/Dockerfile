@@ -1,15 +1,17 @@
 FROM node:latest AS build
 WORKDIR /app
-COPY package.json .
+COPY package*.json .
 RUN npm install
 COPY . .
+ENV NODE_ENV=production
 RUN npm run build 
 
 
 FROM nginx:alpine
+RUN apk update && apk upgrade && apk add --no-cache curl
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY --chown=appuser:appgroup nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build --chown=appuser:appgroup /app/dist /usr/share/nginx/html
+COPY --from=build --chown=appuser:appgroup /app/dist /usr/share/nginx/html/momo-store
 RUN touch /var/run/nginx.pid && \
     chown -R appuser:appgroup /var/run/nginx.pid &&\
     chown -R appuser:appgroup /var/cache/nginx && \
