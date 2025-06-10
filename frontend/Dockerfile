@@ -4,6 +4,8 @@ COPY package*.json .
 RUN npm install
 COPY . .
 ENV NODE_ENV=production
+ENV VUE_APP_API_URL=/api
+ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build 
 
 
