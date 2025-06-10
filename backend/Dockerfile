@@ -1,6 +1,6 @@
 FROM golang:latest AS build
 WORKDIR /app
-RUN useradd -D appuser
+RUN addgroup -S appgroup && addduser -S appuser -G appgroup
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . /app
